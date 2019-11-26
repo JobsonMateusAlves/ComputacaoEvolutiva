@@ -2,16 +2,17 @@
 import random
 import math
 import numpy as np
+from Geral import Geral
 
 class AlgoritmoGenetico:
 
 
     @staticmethod
-    def gerar_populacao(qtd):
+    def gerar_populacao(qtd, qtd_populacao):
 
         populacao = []
 
-        for x in range(8):
+        for x in range(qtd_populacao):
             populacao.append(AlgoritmoGenetico.gerar_individuo(qtd))
         return populacao
 
@@ -26,7 +27,6 @@ class AlgoritmoGenetico:
 
             if len(individuo) == 6:
                 break
-        individuo.append(individuo[0])
 
         return individuo
 
@@ -73,20 +73,135 @@ class AlgoritmoGenetico:
     def get_ranking(vetor_fitness):
 
         n = len(vetor_fitness)
-        max_value = 10
+        max_value = len(vetor_fitness)
         min_value = 0
 
         aptidoes = []
 
         for i in range(len(vetor_fitness)):
             f = (min_value + (max_value - min_value) * (len(vetor_fitness) - (i + 1))/(len(vetor_fitness) - 1))
-            aptidoes.append((f, vetor_fitness[i][1]))
+            aptidoes.append((f, vetor_fitness[i][0], vetor_fitness[i][1]))
 
         return aptidoes
 
+    @staticmethod
+    def get_soma_aptidoes(array):
+        soma = 0
+        for p in array:
+            soma += p[0]
+
+        return soma
 
     @staticmethod
-    def printArray(array):
+    def calcular_probabilidades(array, soma):
 
-        for i in array:
-            print(i)
+        probabilidades = []
+        for p in array:
+            probabilidades.append((round(p[0]/soma, 3), p[1], p[2]))
+
+        return probabilidades
+
+    @staticmethod
+    def roleta(array):
+
+        population = []
+        weights = []
+
+        for p in array:
+            population.append(p[2])
+            weights.append(p[0])
+
+        result = random.choices(
+            population = population,
+            weights = weights,
+            k = 100
+        )
+
+
+        return result[random.randint(0, 99)]
+
+    @staticmethod
+    def reproduzir(individuos, operador):
+
+        if operador == 0:
+            return AlgoritmoGenetico.cross_over_pbx(individuos)
+        else:
+            return AlgoritmoGenetico.cross_over_cx(individuos)
+
+    @staticmethod
+    def cross_over_pbx(individuos):
+        print("pbx")
+
+        filhos = []
+        posicoes = []
+        contador = 0
+        while(contador != 3):
+            pos = random.randint(0, len(individuos[0]) - 1)
+            if not posicoes.__contains__(pos):
+                posicoes.append(pos)
+                contador += 1
+
+        for i in range(2):
+            filho = []
+            fixos = []
+            for p in posicoes:
+                fixos = [individuos[i][p], individuos[i][p], individuos[i][p]]
+
+            for j in range(len(individuos[i])):
+                if posicoes.__contains__(j):
+                    filho.append(individuos[i][j])
+                else:
+                    for k in individuos[(i + 1) % 2]:
+                        if not fixos.__contains__(k) and not filho.__contains__(k):
+                            filho.append(k)
+                            break
+            filhos.append(filho)
+
+        return filhos
+
+    @staticmethod
+    def cross_over_cx(individuos):
+        print("cx")
+
+        filhos = []
+        first = random.randint(0, len(individuos[0]) - 1)
+        posicoes1 = [first]
+
+        last_pos = first
+
+        current2 = individuos[1][last_pos]
+
+        last_pos = Geral.busca(individuos[0], current2)
+
+        while(not posicoes1.__contains__(last_pos)):
+
+            posicoes1.append(last_pos)
+
+            current2 = individuos[1][last_pos]
+
+            last_pos = Geral.busca(individuos[0], current2)
+
+        if len(posicoes1) == len(individuos[0]):
+
+            for i in range(len(individuos)):
+                filho = []
+                for p in posicoes1:
+                    filho.append(individuos[i][p])
+
+                filhos.append(filho)
+        else:
+
+            for i in range(len(individuos)):
+                filho = []
+                for j in range(len(individuos[0])):
+
+                    if posicoes1.__contains__(j):
+                        filho.append(individuos[i][j])
+                    else:
+                        filho.append(individuos[(i + 1) % 2][j])
+
+                filhos.append(filho)
+
+        return filhos
+
+
