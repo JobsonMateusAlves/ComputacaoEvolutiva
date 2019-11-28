@@ -1,236 +1,129 @@
-
-import random
-import math
-import numpy as np
-from Geral import Geral
-
-class AlgoritmoGenetico:
-
-
-    @staticmethod
-    def gerar_populacao(qtd, qtd_populacao):
-
-        populacao = []
-
-        for x in range(qtd_populacao):
-            populacao.append(AlgoritmoGenetico.gerar_individuo(qtd))
-        return populacao
-
-
-    @staticmethod
-    def gerar_individuo(qtd):
-        individuo = []
-        while (True):
-            rand = random.randint(1, qtd)
-            if not (individuo.__contains__(rand)):
-                individuo.append(rand)
-
-            if len(individuo) == qtd:
-                break
-
-        return individuo
-
-    @staticmethod
-    def calculateDistancias(populacao, cidades):
-
-        distancias = []
-
-        for indice, individuo in enumerate(populacao):
-
-            distancia = 0
-
-            for i in range(len(individuo)):
-                cidadeOriggem = cidades[individuo[i] - 1]
-                cidadeDestino = cidades[(individuo[(i + 1) % len(cidades)] - 1)]
-                distancia += math.sqrt(((cidadeOriggem[0] - cidadeDestino[0]) ** 2) + ((cidadeOriggem[1] - cidadeDestino[1]) ** 2))
-
-            distancias.append(distancia)
-            # if distancia < menor_distancia:
-            #     menor_distancia = distancia
-            #     indice_menorDistancia = indice
-
-        return distancias
-
-    @staticmethod
-    def calcularFitness(distancias, maior_distancia):
-
-        vetor_fitness = []
-
-        for indice, dist in enumerate(distancias):
-            vetor_fitness.append(AlgoritmoGenetico.fitness(dist, indice, maior_distancia))
-
-        return vetor_fitness
-
-    @staticmethod
-    def fitness(distancia, indice, k):
-
-        y = (-1 / (k ** 2) * (distancia ** 2)) + 1
-
-
-        return (round(y, 3), indice)
-
-    @staticmethod
-    def get_ranking(vetor_fitness):
-
-        n = len(vetor_fitness)
-        max_value = len(vetor_fitness)
-        min_value = 0
-
-        aptidoes = []
-
-        for i in range(len(vetor_fitness)):
-            f = (min_value + (max_value - min_value) * (len(vetor_fitness) - (i + 1))/(len(vetor_fitness) - 1))
-            aptidoes.append((f, vetor_fitness[i][0], vetor_fitness[i][1]))
-
-        return aptidoes
-
-    @staticmethod
-    def get_soma_aptidoes(array):
-        soma = 0
-        for p in array:
-            soma += p[0]
-
-        return soma
-
-    @staticmethod
-    def calcular_probabilidades(array, soma):
-
-        probabilidades = []
-        for p in array:
-            probabilidades.append((round(p[0]/soma, 3), p[1], p[2]))
-
-        return probabilidades
-
-    @staticmethod
-    def roleta(array):
-
-        population = []
-        weights = []
-
-        for p in array:
-            population.append(p[2])
-            weights.append(p[0])
-
-        result = random.choices(
-            population = population,
-            weights = weights,
-            k = 100
-        )
-
-
-        return result[random.randint(0, 99)]
-
-    @staticmethod
-    def reproduzir(individuos, operador):
-
-        if operador == 0:
-            return AlgoritmoGenetico.cross_over_pbx(individuos)
-        else:
-            return AlgoritmoGenetico.cross_over_cx(individuos)
-
-    @staticmethod
-    def cross_over_pbx(individuos):
-        print("pbx")
-
-        filhos = []
-        posicoes = []
-        contador = 0
-        while(contador != 3):
-            pos = random.randint(0, len(individuos[0]) - 1)
-            if not posicoes.__contains__(pos):
-                posicoes.append(pos)
-                contador += 1
-
-        for i in range(2):
-            filho = []
-            fixos = []
-            for p in posicoes:
-                fixos = [individuos[i][p], individuos[i][p], individuos[i][p]]
-
-            for j in range(len(individuos[i])):
-                if posicoes.__contains__(j):
-                    filho.append(individuos[i][j])
-                else:
-                    for k in individuos[(i + 1) % 2]:
-                        if not fixos.__contains__(k) and not filho.__contains__(k):
-                            filho.append(k)
-                            break
-            filhos.append(filho)
-
-        return filhos
-
-    @staticmethod
-    def cross_over_cx(individuos):
-        print("cx")
-
-        filhos = []
-        first = random.randint(0, len(individuos[0]) - 1)
-        posicoes1 = [first]
-
-        last_pos = first
-
-        current2 = individuos[1][last_pos]
-
-        last_pos = Geral.busca(individuos[0], current2)
-
-        while(not posicoes1.__contains__(last_pos)):
-
-            posicoes1.append(last_pos)
-
-            current2 = individuos[1][last_pos]
-
-            last_pos = Geral.busca(individuos[0], current2)
-
-        if len(posicoes1) == len(individuos[0]):
-
-            for i in range(len(individuos)):
-                filho = []
-                for p in posicoes1:
-                    filho.append(individuos[i][p])
-
-                filhos.append(filho)
-        else:
-
-            for i in range(len(individuos)):
-                filho = []
-                for j in range(len(individuos[0])):
-
-                    if posicoes1.__contains__(j):
-                        filho.append(individuos[i][j])
-                    else:
-                        filho.append(individuos[(i + 1) % 2][j])
-
-                filhos.append(filho)
-
-        return filhos
-
-    @staticmethod
-    def scramble(individuo):
-
-
-        inicial = random.randint(0, len(individuo) - 2)
-
-        final = random.randint(inicial + 1, len(individuo) - 1)
-
-        print("inicial: {} Final: {}".format(inicial, final))
-
-        array = []
-
-        for index, gene in enumerate(individuo):
-            if index >= inicial and index <= final:
-                array.append(gene)
-
-        random.shuffle(array)
-
-        contador = 0
-        for index in range(len(individuo)):
-            if index >= inicial and index <= final:
-                individuo[index] = array[contador]
-                contador += 1
-
-        return individuo
-
-
-    @staticmethod
-    def order_based(individuo):
-        print("order_based")
+# import random
+# import math
+# from Geral import Geral
+#
+# from Methods import Methods
+#
+#
+# class AlgoritmoGenetico:
+#
+#     cidades = []
+#     populacao = []
+#     maior_distancia = 25
+#     max_geracoes = 1
+#     qtd_populacao = 8
+#
+#     distancias = []
+#     probabilidades = []
+#     selecionados = []
+#     array_filhos = []
+#     todos_individuos = []
+#     nova_populacao = []
+#
+#
+#     def __init__(self, cidades, maior_distancia, max_geracoes, qtd_populacao):
+#
+#         self.cidades = cidades
+#         self.maior_distancia = maior_distancia
+#         self.max_geracoes = max_geracoes
+#         self.qtd_populacao = qtd_populacao
+#
+#     def life_cycle(self):
+#
+#         for i in range(self.max_geracoes):
+#             print("{} - Geração".format(i))
+#
+#             self.gerar_populacao()
+#
+#             self.distancia()
+#
+#             self.fitness()
+#
+#             self.selecao_reproducao()
+#
+#             self.reproduzir()
+#
+#             self.mutacao()
+#
+#             self.merge_all_individuos()
+#
+#             self.selecionar()
+#
+#             self.reiniciar()
+#
+#
+#     def gerar_populacao(self):
+#         populacao = Methods.gerar_populacao(len(self.cidades), self.qtd_populacao)
+#         Geral.printArray(populacao)
+#
+#     def distancia(self):
+#         print("Distancias")
+#         self.distancias = Methods.calculateDistancias(self.populacao, self.cidades)
+#         Geral.printArray(self.distancias)
+#
+#     def fitness(self):
+#         print("Fitness:")
+#         vetor_fitness = Methods.calcularFitness(self.distancias, self.maior_distancia)
+#         vetor_fitness.sort()
+#         Geral.printArray(vetor_fitness)
+#
+#         print("Ranking")
+#         aptidoes = Methods.get_ranking(vetor_fitness)
+#         Geral.printArray(aptidoes)
+#
+#         print("Probabilidades")
+#         soma = Methods.get_soma_aptidoes(aptidoes)
+#         self.probabilidades = Methods.calcular_probabilidades(aptidoes, soma)
+#         Geral.printArray(self.probabilidades)
+#
+#     def selecao_reproducao(self):
+#
+#         for index in range(int(self.qtd_populacao / 2)):
+#             pos = []
+#             pos.append(Methods.roleta(self.probabilidades))
+#             pos.append(Methods.roleta(self.probabilidades))
+#             self.selecionados.append(pos)
+#
+#     def reproduzir(self):
+#         print("filhos")
+#
+#         for selecionado in self.selecionados:
+#             pais = [self.populacao[selecionado[0]], self.populacao[selecionado[1]]]
+#             filhos = Methods.reproduzir(pais, 1)
+#             self.array_filhos.append(filhos[0])
+#             self.array_filhos.append(filhos[1])
+#         Geral.printArray(self.array_filhos)
+#
+#     def mutacao(self):
+#
+#         rand = random.randint(0, len(self.array_filhos) - 1)
+#         Methods.mutacao(self.array_filhos[rand], 0)
+#
+#     def merge_all_individuos(self):
+#
+#         print("todos")
+#         for individuo in self.populacao:
+#             self.todos_individuos.append(individuo)
+#         for filho in self.array_filhos:
+#             self.todos_individuos.append(filho)
+#
+#     def selecionar(self):
+#
+#         self.todos_individuos.sort()
+#         # Geral.printArray(self.todos_individuos)
+#
+#         print("selecionados")
+#         for index in range(self.qtd_populacao):
+#             self.nova_populacao.append(self.todos_individuos[index])
+#         Geral.printArray(self.nova_populacao)
+#
+#     def reiniciar(self):
+#         self.populacao = self.nova_populacao
+#         self.distancias = []
+#         self.probabilidades = []
+#         self.selecionados = []
+#         self.array_filhos = []
+#         self.todos_individuos = []
+#         self.nova_populacao = []
+#
+#

@@ -2,7 +2,7 @@ import random
 import math
 from Geral import Geral
 
-from AlgoritmoGenetico import AlgoritmoGenetico
+from Methods import Methods
 
 cidades = [(1, 1), (1, 3), (2, 3), (3, 2), (3, 4), (2, 5), (5, 2), (9, 0), (7, 5), (0, 3), (1, 9)]
 populacao = []
@@ -12,7 +12,7 @@ qtd_populacao = 8
 
 
 print("População")
-populacao = AlgoritmoGenetico.gerar_populacao(len(cidades), qtd_populacao)
+populacao = Methods.gerar_populacao(len(cidades), qtd_populacao)
 Geral.printArray(populacao)
 
 for i in range(max_geracoes):
@@ -20,45 +20,44 @@ for i in range(max_geracoes):
 
     #Distancias
     print("Distancias")
-    distancias = AlgoritmoGenetico.calculateDistancias(populacao, cidades)
+    distancias = Methods.calculateDistancias(populacao, cidades)
     Geral.printArray(distancias)
 
     # Fitness
     print("Fitness:")
-    vetor_fitness = AlgoritmoGenetico.calcularFitness(distancias, maior_distancia)
+    vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
     vetor_fitness.sort()
     Geral.printArray(vetor_fitness)
 
     # Ranking
     print("Ranking")
-    aptidoes = AlgoritmoGenetico.get_ranking(vetor_fitness)
+    aptidoes = Methods.get_ranking(vetor_fitness)
     Geral.printArray(aptidoes)
 
     # Probabilidades
     print("Probabilidades")
-    soma = AlgoritmoGenetico.get_soma_aptidoes(aptidoes)
-    probabilidades = AlgoritmoGenetico.calcular_probabilidades(aptidoes, soma)
+    soma = Methods.get_soma_aptidoes(aptidoes)
+    probabilidades = Methods.calcular_probabilidades(aptidoes, soma)
     Geral.printArray(probabilidades)
 
     # Roleta
     selecionados = []
     for index in range(int(qtd_populacao/2)):
         pos = []
-        pos.append(AlgoritmoGenetico.roleta(probabilidades))
-        pos.append(AlgoritmoGenetico.roleta(probabilidades))
+        pos.append(Methods.roleta(probabilidades))
+        pos.append(Methods.roleta(probabilidades))
         selecionados.append(pos)
     # Reprodução
     print("filhos")
     array_filhos = []
     for selecionado in selecionados:
         pais = [populacao[selecionado[0]], populacao[selecionado[1]]]
-        filhos = AlgoritmoGenetico.reproduzir(pais, 1)
+        filhos = Methods.reproduzir(pais, 1)
         array_filhos.append(filhos[0])
         array_filhos.append(filhos[1])
     Geral.printArray(array_filhos)
 
     # Mutação
-
 
     print("todos")
     todos_individuos = []
@@ -80,4 +79,4 @@ for i in range(max_geracoes):
     print("dashdakas")
     print("")
 
-    # AlgoritmoGenetico.scramble(nova_populacao[0])
+    # Methods.scramble(nova_populacao[0])
