@@ -25,7 +25,7 @@ class AlgoritmoGenetico:
             if not (individuo.__contains__(rand)):
                 individuo.append(rand)
 
-            if len(individuo) == 6:
+            if len(individuo) == qtd:
                 break
 
         return individuo
@@ -204,4 +204,33 @@ class AlgoritmoGenetico:
 
         return filhos
 
+    @staticmethod
+    def scramble(individuo):
 
+
+        inicial = random.randint(0, len(individuo) - 2)
+
+        final = random.randint(inicial + 1, len(individuo) - 1)
+
+        print("inicial: {} Final: {}".format(inicial, final))
+
+        array = []
+
+        for index, gene in enumerate(individuo):
+            if index >= inicial and index <= final:
+                array.append(gene)
+
+        random.shuffle(array)
+
+        contador = 0
+        for index in range(len(individuo)):
+            if index >= inicial and index <= final:
+                individuo[index] = array[contador]
+                contador += 1
+
+        return individuo
+
+
+    @staticmethod
+    def order_based(individuo):
+        print("order_based")

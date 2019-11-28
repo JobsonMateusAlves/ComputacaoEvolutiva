@@ -4,7 +4,7 @@ from Geral import Geral
 
 from AlgoritmoGenetico import AlgoritmoGenetico
 
-cidades = [(1, 1), (1, 3), (2, 3), (3, 2), (3, 4), (2, 5)]
+cidades = [(1, 1), (1, 3), (2, 3), (3, 2), (3, 4), (2, 5), (5, 2), (9, 0), (7, 5), (0, 3), (1, 9)]
 populacao = []
 maior_distancia = 25
 max_geracoes = 1
@@ -77,9 +77,7 @@ for i in range(max_geracoes):
     print("selecionados")
     Geral.printArray(nova_populacao)
 
+    print("dashdakas")
+    print("")
 
-
-
-
-
-
+    # AlgoritmoGenetico.scramble(nova_populacao[0])
