@@ -1,17 +1,14 @@
 import random
-import math
 from Geral import Geral
 
 from Methods import Methods
 import matplotlib.pyplot as plt
-import matplotlib.lines as lines
 
 from plot import MyLine
-import numpy as np
 
 from ReaderManager import ReaderManager
 
-random.seed(3)
+random.seed(1)
 
 c = ReaderManager.get_data()
 c.remove(c[0])
@@ -20,7 +17,8 @@ cidades = c
 
 
 populacao = []
-maior_distancia = 375674
+# maior_distancia = 375674
+maior_distancia = 400000
 max_geracoes = 50
 qtd_populacao = 50
 
