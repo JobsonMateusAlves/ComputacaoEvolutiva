@@ -67,7 +67,7 @@ class Methods:
     @staticmethod
     def fitness(distancia, indice, k):
 
-        y = (-1 / (k ** 2) * (distancia ** 2)) + 1
+        y = ((-1 / (k ** 2)) * (distancia ** 2)) + 1
 
 
         return (round(y, 3), indice)
@@ -136,7 +136,6 @@ class Methods:
 
     @staticmethod
     def cross_over_pbx(individuos):
-        print("pbx")
 
         filhos = []
         posicoes = []
@@ -167,7 +166,6 @@ class Methods:
 
     @staticmethod
     def cross_over_cx(individuos):
-        print("cx")
 
         filhos = []
         first = random.randint(0, len(individuos[0]) - 1)
@@ -212,12 +210,19 @@ class Methods:
 
 #----------------------------------------------- Mutacao --------------------------------------------------
     @staticmethod
-    def mutacao(individuo, operador):
+    def mutacao(individuo, operador, taxa):
+
+        result = random.choices(
+            population=[True, False],
+            weights=[taxa, 1-taxa],
+            k=100
+        )
+        if not result[random.randint(0, 99)]:
+            return individuo
 
         if operador == 0:
             return Methods.scramble(individuo)
-        else:
-            return Methods.order_based(individuo)
+        return Methods.order_based(individuo)
 
 
     @staticmethod
@@ -260,3 +265,4 @@ class Methods:
         individuo[segundo] = aux
 
         return individuo
+
