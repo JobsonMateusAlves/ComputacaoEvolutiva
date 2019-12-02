@@ -8,7 +8,7 @@ from plot import MyLine
 
 from ReaderManager import ReaderManager
 
-random.seed(3)
+random.seed(5)
 
 c = ReaderManager.get_data()
 c.remove(c[0])
@@ -18,8 +18,8 @@ cidades = c
 
 populacao = []
 maior_distancia = 375674
-maior_distancia = 25
-max_geracoes = 10000
+# maior_distancia = 25
+max_geracoes = 50
 qtd_populacao = 50
 
 TAXA_CROSSOVER = 0.75
@@ -51,33 +51,22 @@ for n in range(4):
         MUTACAO = 2
 
     populacao = Methods.gerar_populacao(len(cidades), qtd_populacao)
-    # print("População")
-    # Geral.printArray(populacao)
 
     for i in range(max_geracoes):
-        # print("{} - Geração".format(i + 1))
 
         # ------------------------------------------------- DISTANCIA -----------------------------------------------------
         distancias = Methods.calculateDistancias(populacao, cidades)
-        # print("------------------------------------------------- DISTANCIA -----------------------------------------------------")
-        # Geral.printArray(distancias)
 
         # -------------------------------------------------- FITNESS -----------------------------------------------------
         vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
         vetor_fitness.sort(reverse=True)
-        # print("-------------------------------------------------- FITNESS -----------------------------------------------------")
-        # Geral.printArray(vetor_fitness)
 
         # -------------------------------------------------- RANKING -----------------------------------------------------
         aptidoes = Methods.get_ranking(vetor_fitness)
-        # print("-------------------------------------------------- RANKING -----------------------------------------------------")
-        # Geral.printArray(aptidoes)
 
         # ----------------------------------------------- PROBABILIDADES -----------------------------------------------------
         soma = Methods.get_soma_aptidoes(aptidoes)
         probabilidades = Methods.calcular_probabilidades(aptidoes, soma)
-        # print("----------------------------------------------- PROBABILIDADES -----------------------------------------------------")
-        # Geral.printArray(probabilidades)
 
         # -------------------------------------------------- ROLETA -----------------------------------------------------
         selecionados = []
@@ -106,8 +95,6 @@ for n in range(4):
             todos_individuos.append(individuo)
         for filho in array_filhos:
             todos_individuos.append(filho)
-        # print("----------------------------------------------- TODOS -----------------------------------------------------")
-        # Geral.printArray(todos_individuos)
 
         # -------------------------------------------- DISTANCIA E FITNESS -------------------------------------------------
         distancias = Methods.calculateDistancias(todos_individuos, cidades)
@@ -115,15 +102,11 @@ for n in range(4):
             menor = min(distancias)
         vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
         vetor_fitness.sort(reverse=True)
-        # print("----------------------------------------------- FITNESS_TODOS -----------------------------------------------------")
-        # Geral.printArray(vetor_fitness)
 
         # ----------------------------------------------- NOVA POPULACAO -------------------------------------------------
         nova_populacao = []
         for index in range(qtd_populacao):
             nova_populacao.append(todos_individuos[vetor_fitness[index][1]])
-        # print("----------------------------------------------- SELECIONADOS -----------------------------------------------------")
-        # Geral.printArray(nova_populacao)
 
         # ------------------------------------------------- REINICIANDO -------------------------------------------------
         populacao = nova_populacao
@@ -134,10 +117,14 @@ for n in range(4):
         todos_individuos = []
         nova_populacao = []
 
+    distancias = Methods.calculateDistancias(populacao, cidades)
+    vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
+    vetor_fitness.sort(reverse=True)
+
     print("Melhor")
-    print(populacao[0])
+    print(populacao[vetor_fitness[0][1]])
     print("Menor: {}".format(menor))
-    print("Selecionado: {}".format(Methods.calculateDistancias([populacao[0]], cidades)[0]))
+    print("Selecionado: {}".format(Methods.calculateDistancias([populacao[vetor_fitness[0][1]]], cidades)[0]))
 
 
     fig, ax = plt.subplots()
@@ -159,5 +146,3 @@ hr = now.strftime("%H:%M:%S")
 print(hr)
 
 plt.show()
-
-
