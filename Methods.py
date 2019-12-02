@@ -8,12 +8,12 @@ class Methods:
 
 #-------------------------------------------------- Gerar Populacao --------------------------------------------------
     @staticmethod
-    def gerar_populacao(qtd, qtd_populacao):
+    def gerar_populacao(qtd_cidades, qtd_populacao):
 
         populacao = []
 
         for x in range(qtd_populacao):
-            populacao.append(Methods.gerar_individuo(qtd))
+            populacao.append(Methods.gerar_individuo(qtd_cidades))
         return populacao
 
 
@@ -126,7 +126,15 @@ class Methods:
 
 #----------------------------------------------- Crossover --------------------------------------------------
     @staticmethod
-    def reproduzir(individuos, operador):
+    def reproduzir(individuos, operador, taxa):
+
+        result = random.choices(
+            population=[True, False],
+            weights=[taxa, 1 - taxa],
+            k=100
+        )
+        if not result[random.randint(0, 99)]:
+            return []
 
         if operador == 0:
             return Methods.cross_over_pbx(individuos)
