@@ -30,7 +30,7 @@ class Methods:
 
         return individuo
 
-#----------------------------------------------- Calcular Distancia --------------------------------------------------
+#----------------------------------------------- Fitness --------------------------------------------------
 
     @staticmethod
     def calculateDistancias(populacao, cidades):
@@ -53,24 +53,7 @@ class Methods:
 
         return distancias
 
-#----------------------------------------------- Fitness --------------------------------------------------
-    @staticmethod
-    def calcularFitness(distancias, maior_distancia):
 
-        vetor_fitness = []
-
-        for indice, dist in enumerate(distancias):
-            vetor_fitness.append(Methods.fitness(dist, indice, maior_distancia))
-
-        return vetor_fitness
-
-    @staticmethod
-    def fitness(distancia, indice, k):
-
-        y = ((-1 / (k ** 2)) * (distancia ** 2)) + 1
-
-
-        return (round(y, 3), indice)
 
     @staticmethod
     def get_ranking(vetor_fitness):
@@ -274,3 +257,21 @@ class Methods:
 
         return individuo
 
+
+# @staticmethod
+#     def calcularFitness(distancias, maior_distancia):
+#
+#         vetor_fitness = []
+#
+#         for indice, dist in enumerate(distancias):
+#             vetor_fitness.append(Methods.fitness(dist, indice, maior_distancia))
+#
+#         return vetor_fitness
+#
+#     @staticmethod
+#     def fitness(distancia, indice, k):
+#
+#         y = ((-1 / (k ** 2)) * (distancia ** 2)) + 1
+#
+#
+#         return (round(y, 3), indice)
