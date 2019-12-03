@@ -12,15 +12,15 @@ from ReaderManager import ReaderManager
 c = ReaderManager.get_data()
 c.remove(c[0])
 cidades = c
-# cidades = [(1, 1), (1, 3), (2, 3), (3, 2), (3, 4), (2, 5)]
+cidades = [(1, 1), (1, 3), (2, 3), (3, 2), (3, 4), (2, 5)]
 
 valor_medio_melhores = []
 geracao_x_fitness = []
 
 populacao = []
 
-max_geracoes = 10000
-qtd_populacao = 50
+max_geracoes = 50
+qtd_populacao = 4
 
 TAXA_CROSSOVER = 0.75
 TAXA_MUTACAO = 0.1
