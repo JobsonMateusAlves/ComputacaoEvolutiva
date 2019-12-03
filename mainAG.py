@@ -3,21 +3,23 @@ from Geral import Geral
 from datetime import datetime
 from Methods import Methods
 import matplotlib.pyplot as plt
+import numpy as np
 
 from plot import MyLine
 
 from ReaderManager import ReaderManager
-
-random.seed(5)
 
 c = ReaderManager.get_data()
 c.remove(c[0])
 cidades = c
 # cidades = [(1, 1), (1, 3), (2, 3), (3, 2), (3, 4), (2, 5)]
 
+valor_medio_melhores = []
+geracao_x_fitness = []
 
 populacao = []
-maior_distancia = 375674
+
+maior_distancia = 150000
 # maior_distancia = 25
 max_geracoes = 50
 qtd_populacao = 50
@@ -26,123 +28,161 @@ TAXA_CROSSOVER = 0.75
 TAXA_MUTACAO = 0.1
 menor = 1000000000000
 
-CROSSOVER = 1  # ou 2
-MUTACAO = 1  # ou 2
+CROSSOVER = 1
+MUTACAO = 1
 
-now = datetime.now()
-hr = now.strftime("%H:%M:%S")
-print(hr)
-# for m in range(5):
-for n in range(4):
+for m in range(5):
+    geracao_x_fitness.append([])
+    tempos = []
+    melhores = []
+    iteracoes = []
+    random.seed(m + 1)
 
-    menor = 100000000
+    print("---------------------------- Execução: {} ---------------------------------".format(m + 1))
 
-    if n == 0:
-        CROSSOVER = 1
-        MUTACAO = 1
-    elif n == 1:
-        CROSSOVER = 1
-        MUTACAO = 2
-    elif n == 2:
-        CROSSOVER = 2
-        MUTACAO = 1
-    else:
-        CROSSOVER = 2
-        MUTACAO = 2
+    for n in range(4):
+        geracao_x_fitness[m].append([])
+        menor = 1000000000000
 
-    populacao = Methods.gerar_populacao(len(cidades), qtd_populacao)
+        now = datetime.now()
+        menor = 100000000
 
-    for i in range(max_geracoes):
+        if n == 0:
+            CROSSOVER = 1
+            MUTACAO = 1
+        elif n == 1:
+            CROSSOVER = 1
+            MUTACAO = 2
+        elif n == 2:
+            CROSSOVER = 2
+            MUTACAO = 1
+        else:
+            CROSSOVER = 2
+            MUTACAO = 2
 
-        # ------------------------------------------------- DISTANCIA -----------------------------------------------------
-        distancias = Methods.calculateDistancias(populacao, cidades)
+        populacao = Methods.gerar_populacao(len(cidades), qtd_populacao)
 
-        # -------------------------------------------------- FITNESS -----------------------------------------------------
-        vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
-        vetor_fitness.sort(reverse=True)
+        for i in range(max_geracoes):
 
-        # -------------------------------------------------- RANKING -----------------------------------------------------
-        aptidoes = Methods.get_ranking(vetor_fitness)
+            # ------------------------------------------------- DISTANCIA -----------------------------------------------------
+            distancias = Methods.calculateDistancias(populacao, cidades)
 
-        # ----------------------------------------------- PROBABILIDADES -----------------------------------------------------
-        soma = Methods.get_soma_aptidoes(aptidoes)
-        probabilidades = Methods.calcular_probabilidades(aptidoes, soma)
+            # -------------------------------------------------- FITNESS -----------------------------------------------------
+            vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
+            vetor_fitness.sort(reverse=True)
 
-        # -------------------------------------------------- ROLETA -----------------------------------------------------
-        selecionados = []
-        for index in range(int(qtd_populacao/2)):
-            pos = []
-            pos.append(Methods.roleta(probabilidades))
-            pos.append(Methods.roleta(probabilidades))
-            selecionados.append(pos)
+            # -------------------------------------------------- RANKING -----------------------------------------------------
+            aptidoes = Methods.get_ranking(vetor_fitness)
 
-        # ------------------------------------------------ REPRODUCAO -----------------------------------------------------
-        array_filhos = []
-        for selecionado in selecionados:
-            pais = [populacao[selecionado[0]], populacao[selecionado[1]]]
-            filhos = Methods.reproduzir(pais, CROSSOVER, TAXA_CROSSOVER)
-            if len(filhos) != 0:
-                array_filhos.append(filhos[0])
-                array_filhos.append(filhos[1])
+            # ----------------------------------------------- PROBABILIDADES -----------------------------------------------------
+            soma = Methods.get_soma_aptidoes(aptidoes)
+            probabilidades = Methods.calcular_probabilidades(aptidoes, soma)
 
-        # -------------------------------------------------- MUTACAO -----------------------------------------------------
-        for i, ind in enumerate(array_filhos):
-            array_filhos[i] = Methods.mutacao(ind, MUTACAO, TAXA_MUTACAO)
+            # -------------------------------------------------- ROLETA -----------------------------------------------------
+            selecionados = []
+            for index in range(int(qtd_populacao/2)):
+                pos = []
+                pos.append(Methods.roleta(probabilidades))
+                pos.append(Methods.roleta(probabilidades))
+                selecionados.append(pos)
 
-        # --------------------------------------------------- MERGE ------------------------------------------------------
-        todos_individuos = []
-        for individuo in populacao:
-            todos_individuos.append(individuo)
-        for filho in array_filhos:
-            todos_individuos.append(filho)
+            # ------------------------------------------------ REPRODUCAO -----------------------------------------------------
+            array_filhos = []
+            for selecionado in selecionados:
+                pais = [populacao[selecionado[0]], populacao[selecionado[1]]]
+                filhos = Methods.reproduzir(pais, CROSSOVER, TAXA_CROSSOVER)
+                if len(filhos) != 0:
+                    array_filhos.append(filhos[0])
+                    array_filhos.append(filhos[1])
 
-        # -------------------------------------------- DISTANCIA E FITNESS -------------------------------------------------
-        distancias = Methods.calculateDistancias(todos_individuos, cidades)
-        if min(distancias) < menor:
-            menor = min(distancias)
-        vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
-        vetor_fitness.sort(reverse=True)
+            # -------------------------------------------------- MUTACAO -----------------------------------------------------
+            for i, ind in enumerate(array_filhos):
+                array_filhos[i] = Methods.mutacao(ind, MUTACAO, TAXA_MUTACAO)
 
-        # ----------------------------------------------- NOVA POPULACAO -------------------------------------------------
-        nova_populacao = []
-        for index in range(qtd_populacao):
-            nova_populacao.append(todos_individuos[vetor_fitness[index][1]])
+            # --------------------------------------------------- MERGE ------------------------------------------------------
+            todos_individuos = []
+            for individuo in populacao:
+                todos_individuos.append(individuo)
+            for filho in array_filhos:
+                todos_individuos.append(filho)
 
-        # ------------------------------------------------- REINICIANDO -------------------------------------------------
-        populacao = nova_populacao
-        distancias = []
-        probabilidades = []
-        selecionados = []
-        array_filhos = []
-        todos_individuos = []
-        nova_populacao = []
+            # -------------------------------------------- DISTANCIA E FITNESS -------------------------------------------------
+            distancias = Methods.calculateDistancias(todos_individuos, cidades)
+            if min(distancias) < menor:
+                menor = min(distancias)
+            vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
+            vetor_fitness.sort(reverse=True)
 
-    distancias = Methods.calculateDistancias(populacao, cidades)
-    vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
-    vetor_fitness.sort(reverse=True)
+            # ----------------------------------------------- NOVA POPULACAO -------------------------------------------------
+            nova_populacao = []
+            for index in range(qtd_populacao):
+                nova_populacao.append(todos_individuos[vetor_fitness[index][1]])
 
-    print("Melhor")
-    print(populacao[vetor_fitness[0][1]])
-    print("Menor: {}".format(menor))
-    print("Selecionado: {}".format(Methods.calculateDistancias([populacao[vetor_fitness[0][1]]], cidades)[0]))
+            # ------------------------------------------------- REINICIANDO -------------------------------------------------
+            populacao = nova_populacao
+            geracao_x_fitness[m][n].append(vetor_fitness[0][0])
+            distancias = []
+            probabilidades = []
+            selecionados = []
+            array_filhos = []
+            todos_individuos = []
+            nova_populacao = []
+
+        # ------------------------------------------------- Prints -------------------------------------------------------
+
+        rota = Methods.calculateDistancias([populacao[0]], cidades)[0]
+        print("Melhor rota: {}".format(rota))
+        print(populacao[0])
+        # print("Menor: {}".format(menor))
+
+        melhores.append(Methods.calculateDistancias([populacao[0]], cidades)[0])
+
+        # ------------------------------------------------- Plot -------------------------------------------------------
+        plt.rcParams.update({'figure.max_open_warning': 0})
+        fig, ax = plt.subplots()
+
+        for i in range(len(cidades)):
+            q = 'o'
+            plt.scatter(cidades[i][0], cidades[i][1], marker=q)
+
+        x = []
+        y = []
+        for i in populacao[0]:
+            x.append(cidades[i - 1][0])
+            y.append(cidades[i - 1][1])
+        line = MyLine(x, y, mfc='red', ms=12)
+        ax.add_line(line)
+
+        now2 = datetime.now()
+        # print("1: {} / 2: {}".format(now, now2))
+        tempos.append(now2 - now)
+    # ------------------------------------------------- Prints2 -------------------------------------------------------
+    print("")
+    print("Tempo medio: {}".format(np.sum(tempos)/4))
+    print("Valor medio das melhores: {}".format(np.sum(melhores)/4))
+    valor_medio_melhores.append(np.sum(melhores)/4)
+
+    # ----------------------------------- ger_x_fit ---------------------------------
+
+    maior = 0
+    index_maior = 0
+    for il, l in enumerate(geracao_x_fitness[m]):
+        if l[len(l) - 1] > maior:
+            maior = l[len(l) - 1]
+            index_maior = il
 
 
-    fig, ax = plt.subplots()
+    fig2, ax2 = plt.subplots()
 
-    for i in range(len(cidades)):
-        m = 'o'
-        plt.scatter(cidades[i][0], cidades[i][1], marker=m)
+    ger = []
+    fit = []
+    for g, g_x_f in enumerate(geracao_x_fitness[m][index_maior]):
+        ger.append(g)
+        fit.append(g_x_f)
+    line2 = MyLine(ger, fit, mfc='red', ms=12)
+    ax2.add_line(line2)
 
-    x = []
-    y = []
-    for i in populacao[0]:
-        x.append(cidades[i - 1][0])
-        y.append(cidades[i - 1][1])
-    line = MyLine(x, y, mfc='red', ms=12)
-    ax.add_line(line)
-
-now = datetime.now()
-hr = now.strftime("%H:%M:%S")
-print(hr)
+    ax2.set_xlim([0, 50])
+    ax2.set_ylim([0, 1])
 
 plt.show()
