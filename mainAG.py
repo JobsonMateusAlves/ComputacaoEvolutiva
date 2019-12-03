@@ -19,9 +19,7 @@ geracao_x_fitness = []
 
 populacao = []
 
-maior_distancia = 150000
-# maior_distancia = 25
-max_geracoes = 50
+max_geracoes = 10000
 qtd_populacao = 50
 
 TAXA_CROSSOVER = 0.75
@@ -67,9 +65,12 @@ for m in range(5):
             # ------------------------------------------------- DISTANCIA -----------------------------------------------------
             distancias = Methods.calculateDistancias(populacao, cidades)
 
+
             # -------------------------------------------------- FITNESS -----------------------------------------------------
-            vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
-            vetor_fitness.sort(reverse=True)
+            vetor_fitness = []
+            for index_distancia, distancia in enumerate(distancias):
+                vetor_fitness.append((round(distancia, 3), index_distancia))
+            vetor_fitness.sort()
 
             # -------------------------------------------------- RANKING -----------------------------------------------------
             aptidoes = Methods.get_ranking(vetor_fitness)
@@ -110,8 +111,10 @@ for m in range(5):
             distancias = Methods.calculateDistancias(todos_individuos, cidades)
             if min(distancias) < menor:
                 menor = min(distancias)
-            vetor_fitness = Methods.calcularFitness(distancias, maior_distancia)
-            vetor_fitness.sort(reverse=True)
+            vetor_fitness = []
+            for index_distancia, distancia in enumerate(distancias):
+                vetor_fitness.append((distancia, index_distancia))
+            vetor_fitness.sort()
 
             # ----------------------------------------------- NOVA POPULACAO -------------------------------------------------
             nova_populacao = []
@@ -183,6 +186,8 @@ for m in range(5):
     ax2.add_line(line2)
 
     ax2.set_xlim([0, 50])
-    ax2.set_ylim([0, 1])
-
+    if len(cidades) == 30:
+        ax2.set_ylim([min(valor_medio_melhores) - 40000, max(valor_medio_melhores) + 50000])
+    else:
+        ax2.set_ylim(0,  25)
 plt.show()

@@ -134,7 +134,7 @@ class Methods:
             k=100
         )
         if not result[random.randint(0, 99)]:
-            return []
+            return individuos
 
         if operador == 0:
             return Methods.cross_over_pbx(individuos)
