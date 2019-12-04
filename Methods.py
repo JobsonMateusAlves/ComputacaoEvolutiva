@@ -30,7 +30,7 @@ class Methods:
 
         return individuo
 
-#----------------------------------------------- Fitness --------------------------------------------------
+#----------------------------------------------- Calcular Distancia --------------------------------------------------
 
     @staticmethod
     def calculateDistancias(populacao, cidades):
@@ -47,13 +47,27 @@ class Methods:
                 distancia += math.sqrt(((cidadeOriggem[0] - cidadeDestino[0]) ** 2) + ((cidadeOriggem[1] - cidadeDestino[1]) ** 2))
 
             distancias.append(distancia)
-            # if distancia < menor_distancia:
-            #     menor_distancia = distancia
-            #     indice_menorDistancia = indice
 
         return distancias
 
+#----------------------------------------------- Fitness --------------------------------------------------
+    @staticmethod
+    def calcularFitness(distancias, maior_distancia):
 
+        vetor_fitness = []
+
+        for indice, dist in enumerate(distancias):
+            vetor_fitness.append(Methods.fitness(dist, indice, maior_distancia))
+
+        return vetor_fitness
+
+    @staticmethod
+    def fitness(distancia, indice, k):
+
+        y = ((-1 / (k ** 2)) * (distancia ** 2)) + 1
+
+
+        return (round(y, 3), indice)
 
     @staticmethod
     def get_ranking(vetor_fitness):
@@ -211,7 +225,7 @@ class Methods:
         if not result[random.randint(0, 99)]:
             return individuo
 
-        if operador == 0:
+        if operador == 1:
             return Methods.scramble(individuo)
         return Methods.order_based(individuo)
 
@@ -223,8 +237,6 @@ class Methods:
         inicial = random.randint(0, len(individuo) - 2)
 
         final = random.randint(inicial + 1, len(individuo) - 1)
-
-        print("inicial: {} Final: {}".format(inicial, final))
 
         array = []
 
@@ -257,21 +269,3 @@ class Methods:
 
         return individuo
 
-
-# @staticmethod
-#     def calcularFitness(distancias, maior_distancia):
-#
-#         vetor_fitness = []
-#
-#         for indice, dist in enumerate(distancias):
-#             vetor_fitness.append(Methods.fitness(dist, indice, maior_distancia))
-#
-#         return vetor_fitness
-#
-#     @staticmethod
-#     def fitness(distancia, indice, k):
-#
-#         y = ((-1 / (k ** 2)) * (distancia ** 2)) + 1
-#
-#
-#         return (round(y, 3), indice)
